@@ -19,9 +19,9 @@ services:
     depends_on:
       - ollama
 
-  vectordb:
+  aimap:
     build: .
-    container_name: vectordb-app
+    container_name: aimap-app
     ports:
       - "8080:8080"
     environment:
