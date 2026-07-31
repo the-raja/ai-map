@@ -1,19 +1,33 @@
-# Use a lightweight, official Python runtime
+# Use an official lightweight Python runtime
 FROM python:3.11-slim
 
-# Set working directory inside the container
+# Install system dependencies (curl, ca-certificates, procps) needed for Ollama
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Ollama binary inside the Docker image
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Set working directory inside container
 WORKDIR /app
 
-# Prevent Python from writing .pyc files and buffer stdout/stderr
+# Prevent Python from writing .pyc files and buffer logs
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Copy project files into the container
+# Copy application files
 COPY main.py .
 COPY index.html .
+COPY entrypoint.sh .
 
-# Expose port 8080 for the VectorDB server
-EXPOSE 8080
+# Ensure entrypoint script is executable
+RUN chmod +x entrypoint.sh
 
-# Command to run the application
-CMD ["python", "main.py"]
+# Expose ports: 8080 (AI-Map Web UI) and 11434 (Ollama)
+EXPOSE 8080 11434
+
+# Set entrypoint to run Ollama + AI-Map all-in-one
+ENTRYPOINT ["/app/entrypoint.sh"]
