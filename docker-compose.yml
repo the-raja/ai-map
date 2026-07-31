@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-service
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+    restart: always
+
+  model-init:
+    image: curlimages/curl:latest
+    container_name: ollama-model-initializer
+    volumes:
+      - ./init-ollama.sh:/init-ollama.sh
+    entrypoint: ["/bin/sh", "/init-ollama.sh"]
+    depends_on:
+      - ollama
+
+  vectordb:
+    build: .
+    container_name: vectordb-app
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_HOST=ollama
+      - OLLAMA_PORT=11434
+    depends_on:
+      - ollama
+    restart: always
+
+volumes:
+  ollama_storage:
