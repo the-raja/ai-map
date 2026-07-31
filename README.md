@@ -117,7 +117,7 @@ Recommended for full stack evaluation. Provisions the VectorDB engine, Ollama se
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/AI-Map.git
+   git clone https://github.com/the-raja/AI-Map.git
    cd AI-Map
    ```
 2. Build and launch the container suite:
@@ -132,7 +132,7 @@ Recommended for full stack evaluation. Provisions the VectorDB engine, Ollama se
 Recommended for zero-footprint testing without requiring local source code checkout:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/YOUR_USERNAME/ai-map:latest
+docker run -p 8080:8080 ghcr.io/the3raja/ai-map:latest
 ```
 Access the application interface at **`http://localhost:8080`**.
 
