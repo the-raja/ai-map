@@ -120,6 +120,8 @@ docker run -p 8080:8080 ghcr.io/the-raja/ai-map:latest
 ```
 Access the web interface at **`http://localhost:8080`**.
 
+> **Note**: If port 8080 is already allocated on your machine, free it via `docker stop $(docker ps -q)` or bind to another port like `-p 8083:8080`.
+
 ---
 
 ### Option B: Containerized Source Deployment (Docker Compose)
