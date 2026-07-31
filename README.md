@@ -1,102 +1,132 @@
-# VectorDB — Vector Database in Python
+# 🚀 VectorDB Engine & RAG Visualizer
 
-A fully working **Vector Database** built from scratch in **Python** (using standard library) with an interactive web UI.  
-Implements **HNSW**, **KD-Tree**, and **Brute Force** search algorithms side-by-side, plus a **RAG pipeline** powered by a local LLM via Ollama.
+[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD-Passing-brightgreen?style=flat-square&logo=githubactions)](https://github.com)
+[![Docker](https://img.shields.io/badge/Docker-Supported-blue?style=flat-square&logo=docker)](https://www.docker.com/)
+[![Python](https://img.shields.io/badge/Python-3.11+-yellow?style=flat-square&logo=python)](https://www.python.org/)
+[![C++](https://img.shields.io/badge/C++-17-00599C?style=flat-square&logo=cplusplus)](https://isocpp.org/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-> Converted from the original C++ VectorDB implementation into clean, idiomatic Python.
-
----
-
-## Features
-
-| Feature | Description |
-|---|---|
-| **3 Search Algorithms** | HNSW (production-grade graph search), KD-Tree, Brute Force — run all three and compare latency |
-| **3 Distance Metrics** | Cosine similarity, Euclidean distance, Manhattan distance |
-| **16D Demo Vectors** | 20 pre-loaded semantic vectors across 4 categories (CS, Math, Food, Sports) |
-| **2D PCA Scatter Plot** | Live visualization of semantic space — watch clusters form |
-| **Real Document Embedding** | Paste any text → Ollama embeds it with `nomic-embed-text` (768D) |
-| **RAG Pipeline** | Ask questions about your documents → HNSW retrieves context → local LLM answers via Ollama (`llama3.2`) |
-| **Full REST API** | CRUD endpoints: search, insert, delete, benchmark, hnsw-info, doc management, RAG |
-| **Zero Dependencies** | Built using Python standard library (`http.server`, `heapq`, `urllib`, `threading`, `dataclasses`) |
+> A production-grade **Vector Database Engine & RAG Visualizer** built **from scratch** in both **Python** and **C++** (zero third-party vector DB wrappers).  
+> Features custom implementations of **HNSW**, **KD-Tree**, and **Brute-Force** spatial indexes, real-time **2D PCA dimensionality reduction visualization**, and an offline **RAG (Retrieval-Augmented Generation)** pipeline powered by local LLMs via Ollama.
 
 ---
 
-## How It Works
+## 🌟 Executive Summary
 
+Most AI applications rely on heavy pre-packaged abstraction layers like ChromaDB or Pinecone. This project demonstrates low-level computer science fundamentals by engineering the spatial indexing data structures, distance metrics, and REST serving engine from first principles:
+
+* **Custom Multilayer HNSW Graph**: Implements Hierarchical Navigable Small World skip-graph indexing achieving $O(\log N)$ approximate nearest neighbor search.
+* **Side-by-Side Algorithm Benchmarking**: Live microsecond-level performance benchmarking across **HNSW**, **KD-Tree**, and **Brute-Force** search.
+* **Real-Time 2D PCA Visualizer**: Projects high-dimensional semantic vectors onto an interactive 2D HTML5 Canvas using Power Iteration Principal Component Analysis.
+* **100% Private Offline RAG Pipeline**: Chunks documents, generates 768D embeddings (`nomic-embed-text`), retrieves top-$k$ context, and generates natural answers via a local LLM (`llama3.2`) with **zero cloud API costs**.
+* **DevOps & Containerization**: Fully containerized using `docker-compose` with an automated AI model bootstrap script and GitHub Actions CI/CD pipeline publishing to **GitHub Container Registry (GHCR)**.
+
+---
+
+## 📐 System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer"]
+        UI["Interactive Web Dashboard\n(HTML5 Canvas + PCA Visualizer)"]
+    end
+
+    subgraph Server ["Engine Layer (Python / C++)"]
+        API["REST HTTP Server\n(Threaded / CORS Enabled)"]
+        BF["Brute Force Index\nO(N) exact search"]
+        KDT["KD-Tree Index\nSpatial partitioning"]
+        HNSW["HNSW Graph Index\nO(log N) multilayer skip graph"]
+        DocDB["Document Database\nChunker & Vector Store"]
+    end
+
+    subgraph LLM ["Local AI Layer (Ollama)"]
+        EMB["nomic-embed-text\n(768D Vector Embedding)"]
+        GEN["llama3.2 LLM\n(Context Generation)"]
+    end
+
+    UI <-->|REST API| API
+    API --> BF & KDT & HNSW & DocDB
+    DocDB <-->|Generate Embeddings| EMB
+    API <-->|RAG Prompt + Context| GEN
 ```
-Your Text
-    │
-    ▼
-Ollama (nomic-embed-text)          ← converts text to a 768-dimensional vector
-    │
-    ▼
-HNSW Index (Python)                ← indexes the vector in a multilayer graph
-    │
-    ▼
-Semantic Search                    ← finds nearest neighbors in vector space
-    │
-    ▼
-Ollama (llama3.2)                  ← reads retrieved chunks, generates an answer
-    │
-    ▼
-Answer
-```
 
 ---
 
-## Prerequisites
+## 🔬 Algorithmic Comparison
 
-1. **Python 3.7+** (No external packages required!)
-2. **Ollama** (optional, for real document embeddings & RAG pipeline)
-   - Download from: [https://ollama.com](https://ollama.com)
-   - Pull embedding model: `ollama pull nomic-embed-text`
-   - Pull LLM model: `ollama pull llama3.2`
+| Algorithm | Index Construction | Search Complexity | Ideal Dataset Size | Characteristics |
+|---|---|---|---|---|
+| **Brute Force** | $O(1)$ | $O(N \cdot D)$ | $N < 1,000$ | 100% exact recall baseline; linear scan |
+| **KD-Tree** | $O(N \log N)$ | $O(\log N)$ avg | $N < 100,000$ ($D < 20$) | Hyperplane spatial partitioning |
+| **HNSW** | $O(N \log N)$ | $O(\log N)$ | $N > 1,000,000+$ | Production-grade probabilistic graph |
+
+### Distance Metrics Implemented
+* **Cosine Similarity**: $D_{\text{cos}}(a,b) = 1 - \frac{a \cdot b}{\|a\| \|b\|}$
+* **Euclidean Distance (L2)**: $D_{\text{euc}}(a,b) = \sqrt{\sum (a_i - b_i)^2}$
+* **Manhattan Distance (L1)**: $D_{\text{man}}(a,b) = \sum |a_i - b_i|$
 
 ---
 
-## Quick Start
+## ⚡ Quick Start
 
-### 1. Run the Python Server
+### Option 1: Docker (Recommended — 1 Command)
 
-In your terminal / PowerShell:
+No dependencies required! Docker automatically boots Ollama, downloads the AI models, and launches the VectorDB application:
 
 ```bash
+docker compose up --build
+```
+
+Access the visual dashboard at **`http://localhost:8080`**.
+
+### Option 2: Native Python
+
+```bash
+# Run unit tests
+python test_vectordb.py
+
+# Start VectorDB server
 python main.py
 ```
 
-Output:
-```
-=== VectorDB Engine (Python) ===
-http://localhost:8080
-20 demo vectors | 16 dims | HNSW+KD-Tree+BruteForce
-Ollama: ONLINE
-  embed model: nomic-embed-text  gen model: llama3.2
-```
+### Option 3: High-Performance C++ Engine
 
-### 2. Open Web Visualizer
+```bash
+# Compile with GCC -O2 optimizations
+g++ -std=c++17 -O2 main.cpp -o db -lws2_32
 
-Open your browser and visit:
-```
-http://localhost:8080
+# Run executable
+./db
 ```
 
 ---
 
-## REST API Specification
+## 📡 REST API Reference
 
-### Demo Vector Endpoints
-- `GET /search?v=...&k=5&metric=cosine&algo=hnsw` — Vector k-NN search
-- `POST /insert` — Insert a new demo vector (`{"metadata":"...","category":"...","embedding":[...]}`)
-- `DELETE /delete/{id}` — Delete a vector by ID
-- `GET /items` — List all demo vectors
-- `GET /benchmark?v=...&k=5&metric=cosine` — Compare latency across HNSW, KD-Tree, and Brute Force
-- `GET /hnsw-info` — Inspection data for multi-layer graph visualization
+### Vector Operations
+* `GET /search?v=...&k=5&metric=cosine&algo=hnsw` — Perform $k$-NN search
+* `POST /insert` — Insert custom vector item
+* `GET /items` — Fetch all stored vectors & metadata
+* `GET /benchmark?v=...&k=5&metric=cosine` — Compare latency across all 3 algorithms
+* `GET /hnsw-info` — Fetch multi-layer graph node/edge topology
 
-### Document & RAG Endpoints
-- `POST /doc/insert` — Insert and chunk a document (`{"title":"...","text":"..."}`)
-- `DELETE /doc/delete/{id}` — Delete a document chunk
-- `GET /doc/list` — List all document chunks
-- `POST /doc/search` — Perform semantic retrieval on docs (`{"question":"...","k":3}`)
-- `POST /doc/ask` — Full RAG generation pipeline (`{"question":"...","k":3}`)
-- `GET /status` — System health & Ollama connection status
+### RAG & Document Pipeline
+* `POST /doc/insert` — Chunk and embed raw document text
+* `GET /doc/list` — List all document chunks
+* `POST /doc/ask` — Execute end-to-end RAG query pipeline (`question` $\rightarrow$ `embed` $\rightarrow$ `retrieve` $\rightarrow$ `LLM generate`)
+* `GET /status` — Engine health & Ollama model status
+
+---
+
+## 🛠️ Technology Stack
+
+* **Core Logic**: Python 3.11 (Standard Library) / C++17
+* **Web UI**: HTML5 Canvas, Vanilla CSS3 (Glassmorphism), JavaScript (ES6+)
+* **Local LLM**: Ollama (`nomic-embed-text`, `llama3.2`)
+* **DevOps**: Docker, Docker Compose, GitHub Actions CI/CD, GHCR
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for details.
