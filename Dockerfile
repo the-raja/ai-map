@@ -1,15 +1,17 @@
 # Use an official lightweight Python runtime
 FROM python:3.11-slim
 
-# Install system dependencies (curl, ca-certificates, procps) needed for Ollama
+# Install system dependencies (curl, ca-certificates, procps)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Ollama binary inside the Docker image
-RUN curl -fsSL https://ollama.com/install.sh | sh
+# Download and install official standalone Ollama Linux binary directly
+RUN curl -fsSL https://ollama.com/download/ollama-linux-amd64.tar.gz -o /tmp/ollama.tar.gz \
+    && tar -C /usr -xzf /tmp/ollama.tar.gz \
+    && rm /tmp/ollama.tar.gz
 
 # Set working directory inside container
 WORKDIR /app
