@@ -112,15 +112,25 @@ Answer
 
 ## ⚡ Installation & Quick Start
 
-### Option A: Containerized Deployment (Docker Compose)
-Recommended for full stack evaluation. Provisions the VectorDB engine, Ollama service, and automates AI model bootstrapping in isolated containers:
+### Option A: All-in-One Public Docker Container (Recommended — 1 Command)
+Runs the entire system (AI-Map Engine + Embedded Ollama + Auto Model Downloader) inside a single self-contained container with zero repository cloning required:
+
+```bash
+docker run -p 8080:8080 ghcr.io/the-raja/ai-map:latest
+```
+Access the web interface at **`http://localhost:8080`**.
+
+---
+
+### Option B: Containerized Source Deployment (Docker Compose)
+Recommended for local development with multi-container orchestration:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/the-raja/AI-Map.git
-   cd AI-Map
+   git clone https://github.com/the-raja/ai-map.git
+   cd ai-map
    ```
-2. Build and launch the container suite:
+2. Launch the container suite:
    ```bash
    docker compose up --build
    ```
@@ -128,29 +138,19 @@ Recommended for full stack evaluation. Provisions the VectorDB engine, Ollama se
 
 ---
 
-### Option B: Pre-built Container Execution (Registry Direct)
-Recommended for zero-footprint testing without requiring local source code checkout:
-
-```bash
-docker run -p 8080:8080 ghcr.io/the-raja/ai-map:latest
-```
-Access the application interface at **`http://localhost:8080`**.
-
----
-
 ### Option C: Native Local Execution (Python 3.11+)
-Recommended for local development, algorithm experimentation, or running outside containerized environments:
+Recommended for local engine development or running without Docker:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/AI-Map.git
-   cd AI-Map
+   git clone https://github.com/the-raja/ai-map.git
+   cd ai-map
    ```
-2. Execute automated unit test suite:
+2. Execute unit test suite:
    ```bash
    python test_vectordb.py
    ```
-3. Launch native HTTP serving engine:
+3. Launch HTTP serving engine:
    ```bash
    python main.py
    ```
