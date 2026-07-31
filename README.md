@@ -132,7 +132,7 @@ Recommended for full stack evaluation. Provisions the VectorDB engine, Ollama se
 Recommended for zero-footprint testing without requiring local source code checkout:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/the3raja/ai-map:latest
+docker run -p 8080:8080 ghcr.io/the-raja/ai-map:latest
 ```
 Access the application interface at **`http://localhost:8080`**.
 
